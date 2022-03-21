@@ -1,0 +1,9 @@
+{
+  "host": "localhost",
+  "port": 47365,
+  "min_caract": 1,
+  "max_caract": 11,
+  "ano_minimo": 1000,
+  "ano_maximo": 9999,
+  "capacidad_servidor": 4
+}
