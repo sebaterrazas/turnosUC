@@ -1,0 +1,215 @@
+<div class="columns">
+    <aside class="column is-4">
+        <div class="box">
+            <div class="container is-fluid is-dark" align="center">
+                <figure class="image">
+                    <%= image_tag(@user.display_avatar, :class=>"is-rounded", style: "max-height: 120px; width: auto;") %>
+                </figure>
+                <h1 class="title is-2">
+                    <%= @user.username %>
+                </h1>
+                <table class="table">
+                    <tr class="ml-3">
+                        <td align="right"><strong> Email: </strong></td>
+                        <td align="left"><%= @user.email%></td>
+                    </tr>
+                    <tr class="ml-3">
+                        <td align="right"><strong> Telefono: </strong></td>
+                        <td align="left"><%= @user.phone%></td>
+                    </tr>
+                    <tr class="ml-3">
+                        <td align="right"><strong> Dirección: </strong></td>
+                        <td align="left"><%= @user.address%></td>
+                    </tr>
+                    <tr class="ml-3">
+                        <td align="right"><strong> Calificación: </strong></td>
+                        <td align="left"><%=@nota_promedio%> </td>
+                    </tr>
+                </table>           
+
+            <div >
+                <% if @user == current_user %>
+                    <%= link_to "Editar perfil", edit_user_registration_path, :class=> "button is-info is-outlined" %>
+                <% end %>
+            </div>
+        </div>
+    </aside>
+    <div class="column is-8">
+        <div class="box">
+            <div class="tabs is-boxed is-centered" id="nav">
+                <ul>
+                    <li data-target="pane-2" id="2">
+                        <a>
+                            <span class="icon is-small"><i class="fa-solid fa-car-on"></i></span>
+                            <span>Viajes</span>
+                        </a>
+                    </li>
+                <% if current_user == @user %>
+                    <li data-target="pane-1" id="1" class="is-active">
+                        <a>
+                            <span class="icon is-small"><i class="fa-solid fa-calendar"></i></span>
+                            <span>Calendario</span>
+                        </a>
+                    </li>
+                    <li data-target="pane-4" id="4" >
+                        <a>
+                            <span class="icon is-small"><i class="fa-solid fa-person-arrow-up-from-line"></i></span>
+                            <span>Solicitudes (<%= @pending_requests.count %>)</span>
+                        </a>
+                    </li>
+                <% end %>
+                    <li data-target="pane-3" id="3" <% unless current_user == @user %> class="is-active" <% end %> >
+                        <a>
+                            <span class="icon is-small"><i class="fa-solid fa-person-circle-question"></i></span>
+                            <span>Reseñas (<%= @user.recieved_reviews.count%>)</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="tab-content">
+                <div class="tab-pane <% if current_user == @user %> is-active <% end %>" id="pane-1">
+                    <div class="title is-4">
+                        <b>Viajes de la semana</b>
+                    </div>
+                    <div class="title is-5">
+                        <div id="events_calendar">
+                            <%= render partial: "calendar" %>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="pane-2">
+                    <table class="table is-striped" style="min-width:690px;">
+                        <caption class="title is-4"><b>Todos sus Viajes</b></caption>
+                        <thead> 
+                        <tr align="center">
+                            <th style="min-width: 70px;"></th>
+                            <th style="width: 90px;">Conductor</th>
+                            <th style="min-width: 70px;">Fecha</th>
+                            <th style="min-width: 70px;">Hora</th>
+                            <th style="min-width: 100px;">Desde</th>
+                            <th style="min-width: 80px;">Hasta</th>
+                            <th style="min-width: 70px;">Pasajeros</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div id="table-wrapper">
+                        <div id="table-scroll">
+                            <table class="table is-striped is-hoverable">
+                                <tbody>
+                                <% for turno in @user.participating_turnos.sort_by(&:datetime) %>
+                                <tr align="center">
+                                    <td>
+                                    <figure class="image">
+                                        <%= image_tag(turno.driver.display_avatar, :class=>"is-rounded", style:  "max-height: 120px; width: auto;") %>
+                                    </figure>
+                                    </td> 
+                                    <td style="width: 90px;"> <%= turno.driver.username %> </td>
+                                    <td style="min-width: 100px;"> <%= turno.datetime.strftime("%d de %b") %> </td> 
+                                    <td> <%= turno.datetime.strftime("%H:%M") %> </td> 
+                                    <td> <%= turno.departure_address %> </td>
+                                    <td> <%= turno.arrival_address %> </td>
+                                    <td style="min-width: 70px;"> <%= turno.passengers.count %> / <%= turno.seats %> </td>
+                                    <td><%= button_to "Ver Turno", turnos_show_path(turno.id), method: :get, :class => "button is-small is-info is-light" %></td>
+                                </tr>
+                                <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane <% unless current_user == @user %> is-active <% end %>" id="pane-3">
+                    <h1 class="title is-4"> <b>Reseñas como conductor </b></h1>
+                    <%= notice %>
+                    <table align='center' class="table is-striped is-hoverable has-text-centered" style="width:600px; overflow:auto">
+                        <tr align='center'>
+                        <thead>
+                            <th>Calificacion</th>
+                            <th>Detalle</th>
+                        </thead>
+                        </tr>
+                        <% @user.recieved_reviews.each do |review| %>
+                            <tr>
+                            <td><%= review.qualification %></td>
+                            <td align="left"><%= review.content %></td>
+                            </tr>
+                        <% end %>
+                    </table>
+                </div>
+                <div class="tab-pane" id="pane-4">
+                    <table class="table is-striped" style="min-width:690px;">
+                        <caption class="title is-4"><b>Turnos con solicitudes pendientes</b></caption>
+                        <thead> 
+                        <tr align="center">
+                            <th style="min-width: 40px;"></th>
+                            <th style="min-width: 90px;">Fecha</th>
+                            <th style="min-width: 70px;">Hora</th>
+                            <th style="min-width: 100px;">Conductor</th>
+                            <th style="min-width: 100px;">Desde</th>
+                            <th style="min-width: 100px;">Hasta</th>
+                            <th style="min-width: 100px;">Pasajeros</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div id="table-wrapper">
+                        <div id="table-scroll">
+                            <table class="table is-striped is-hoverable">
+                                <tbody>
+                                <% for request in @pending_requests %>
+                                <tr align="center">
+                                    <% turno = request.turno %>
+                                    <td>
+                                    <figure class="image">
+                                        <%= image_tag(turno.driver.display_avatar, :class=>"is-rounded", style: "max-height: 32px; width: auto;") %>
+                                    </figure>
+                                    </td> 
+                                    <td style="min-width: 100px;"> <%= turno.datetime.strftime("%d de %b") %> </td> 
+                                    <td> <%= turno.datetime.strftime("%H:%M") %> </td> 
+                                    <td> <%= turno.driver.username %> </td> 
+                                    <td> <%= turno.departure_address %> </td>
+                                    <td> <%= turno.arrival_address %> </td>
+                                    <td style="min-width: 70px;"> <%= turno.passengers.count %> / <%= turno.seats %> </td>
+                                    <td><%= button_to "Ver Turno", turnos_show_path(turno.id), method: :get, :class => "button is-small is-info is-light" %></td>
+                                </tr>
+                                <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://unpkg.com/bulma-modal-fx/dist/js/modal-fx.min.js"></script>
+<script>
+    document.querySelectorAll("#nav li").forEach(function(navEl) {
+        navEl.onclick = function() { toggleTab(this.id, this.dataset.target); }
+    });
+
+    function toggleTab(selectedNav, targetId) {
+        var navEls = document.querySelectorAll("#nav li");
+
+        navEls.forEach(function(navEl) {
+        if (navEl.id == selectedNav) {
+        navEl.classList.add("is-active");
+        } else {
+        if (navEl.classList.contains("is-active")) {
+            navEl.classList.remove("is-active");
+        }
+        }
+        });
+
+        var tabs = document.querySelectorAll(".tab-pane");
+
+        tabs.forEach(function(tab) {
+            if (tab.id == targetId) {
+            tab.style.display = "block";
+            } else {
+            tab.style.display = "none";
+            }
+        });
+    }
+</script> 

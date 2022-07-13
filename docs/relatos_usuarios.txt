@@ -1,0 +1,118 @@
+1. Crear usuario
+Yo como estudiante quiero poder crearme un usuario para poder usar la aplicación.
+Condiciones de satisfacción:
+- se debe ingresar un nombre de usuario, contraseña inventada y mail
+- la contraseña se debe ingresar dos veces para asegurar que el usuario no se equivoque al inventarla
+
+2. Ingresar usuario
+Yo como usuario creado quiero poder ingresar a mi cuenta desde cualquier dispositivo con mi contraseña para tener un acceso más cómodo a la app y que este sea seguro.
+Condiciones de satisfacción:
+- para ingresar al usuario ya creado solo se solicita nombre de usuario y contraseña
+- la contraseña se muestra oculta por defecto (.....) pero debe estar la opción de "mostrar contraseña" para poder visualizar lo que se está escribiendo
+
+3. Guardar Contraseña
+Yo como usuarios creado quiero que la app me dé la opción de guardar el usuario y la contraseña para no tener que escribirla cada vez que ingreso a la app.
+Condiciones de satisfacción:
+- por defecto la contraseña se debe mostrar oculta (o sea con puntos en vez de caracteres)
+- también debe estar la opción de no guardar la contraseña por si el usuario no se siente seguro.
+
+4. Crear viaje
+Yo como conductor quiero poder crear un viaje y ofrecer los cupos que tengo disponibles para llevar a más gente y costear los gastos del viaje.
+Condiciones de satisfacción:
+- En cada viaje creado se deben pedir los datos del auto (marca, modelo, capacidad, combustible que usa) y estos se deben poder guardar para viajes futuros.
+- Se debe ingresar el origen y el destino del viaje, junto con un punto de encuentro. (todo esto con palabras, no con un mapa)
+
+5. Estado del viaje
+Como conductor quiero que una vez creado el viaje, quiero poder abrir una ventana del viaje donde vayan apareciendo las novedades, como cuantos cupos quedan disponibles, las solicitudes para unirse a mi viaje, una lista de los que ya están confirmados en el viaje, etc. para estar consiente de todos esos datos.
+Condiciones de satisfacción:
+- Dentro de esta ventana debe aparecer la opción de aceptar o rechazar las solicitudes
+- Las solicitudes deben aparecer en orden de quien solicitó primero unirse al viaje
+- se deben poder editar datos del viaje, como el auto en que se viaja o el punto de encuentro.
+
+6. Buscar autos cercanos
+Yo como estudiante sin auto o ida, quiero poder buscar los viajes creados que van hacia el mismo campus que yo desde una dirección cercana para poder llegar a la universidad de forma segura y barata.
+Condiciones de satisfacción:
+- En el buscador se debe poder filtrar por destino, hora de salida u hora de llegada aproximada.
+- Una vez que me aparecen las opciones, al apretarlas debo poder ver las datos del viaje que ingresó el conductor (auto, punto de encuentro, etc), descripción del perfil del conductor y la lista de quienes ya están confirmados en el viaje.
+
+7. Editar perfil de conductor
+Yo como conductor quiero poder añadir una breve descripción de mí, para que le aparezca a los que estén buscando un viaje para que sepan un poco de mis intereses, personalidad, que música escucho en el auto, etc.
+Condiciones de satisfacción:
+- Esta descripción se debe poder editar desde el propio perfil de todas las cuentas. (No hay distintos tipos de cuanta para un conductor o un no conductor)
+- Esta descripción aparecerá en la ventana que se abre cuando la gente selecciona un viaje para subirse.
+
+8. Modificar perfil de pasajero
+Yo como pasajero necesito modificar mi perfil para poder editar datos personales, como gustos musicales, entre otros.
+Condiciones de satisfacción:
+-Verificar que cada entrada tenga el tipo de dato correcto.
+
+9. Ver perfil de otros usuarios.
+Yo como usuario corriente de la página necesito ver el perfil de otros usuarios para conocer a la persona en el contexto de conductor/pasajero, y ver como otros usuarios los han evaluado.
+Condiciones de satisfacción:
+-Verificar que los datos estén actualizados.
+
+10. Evaluar al conductor del viaje
+Yo como pasajero necesito evaluar al conductor de un viaje para los otros pasajeros conozcan como es el conductor.
+Condiciones de satisfacción:
+-Verificar que los datos ingresados sean del tipo correcto.
+-Verificar que el pasajero efectivamente haya estado en ese viaje con ese conductor.
+
+11. Conversar con integrantes del viaje
+Yo como integrante de un viaje necesito poder conversar con el resto del viaje para coordinar lugar y hora de pickup, entre otras cosas.
+Condiciones de satisfacción:
+-Verificar que estén todos los participantes del viaje.
+-Verificar que estén actualizados los datos (si alguien se baja, que esa persona se salga del chat).
+-Verificar que quede claro quiénes son los pasajeros y quién es el conductor.
+
+12. Salir de la cuenta actual
+Yo como usuario de la página necesito salir de la cuenta ingresada actualmente para cambiar de cuenta, o simplemente parar de usar la página.
+Condiciones de satisfacción:
+-Verificar que al salir borren todas las solicitudes pendientes.
+
+13. Solicitar viaje
+Yo como pasajero necesito solicitar un viaje para tener un cupo en el viaje con destino a la universidad.
+Condiciones de satisfacción:
+-Verificar que el viaje siga disponible (que queden cupos).
+-Verificar que se deshabilite que el pasajero pueda reservar otro viaje.
+-Verificar que si el conductor acepta o rechaza al pasajero.
+-Verificar que el viaje inicia desde cerca.
+
+14. Cancelar viaje (pasajero)
+Yo como pasajero que ya reservó un viaje necesito poder cancelar la reserva para habilitar mi cupo porque ya no necesito/quiero desplazarme a la universidad.
+Condiciones de satisfacción:
+-Verificar que el cupo que ocupaba se desocupe.
+-Verificar que se notifique al conductor.
+-Verificar que se vuelva a habilitar la opción que el pasajero reserve otro viaje.
+
+15. Cancelar viaje (conductor)
+Yo como conductor necesito poder cancelar y eliminar un viaje que había creado para avisar a los pasajeros que el viaje al final no se realizará.
+Condiciones de satisfacción:
+-Verificar que se notifique y se cancele el viaje a los pasajeros.
+-Verificar que el conductor sea habilitado para crear un viaje nuevo.
+
+16. Aceptar/Rechazar solicitud de viaje (conductor)
+Yo como conductor necesito rechazar o aceptar la solicitud del pasajero para definir los cupos del viaje.
+Condiciones de satisfacción:
+-Verificar que queden cupos disponibles para el viaje.
+-Verificar que la solicitud del pasajero siga vigente.
+
+17. Cancelar solicitud de viaje
+Yo como pasajero que solicitó un viaje necesito cancelar la solicitud para que no se me considere para el viaje.
+Condiciones de satisfacción:
+-Verificar que siga existiendo una solicitud del pasajero para ese viaje.
+
+18. Cambiar contraseña
+Yo como usuario con un perfil ya creado quiero poder cambiar mi contraseña en cualquier momento para tener más seguridad, en caso de olvidarla o de que sufra algún robo de información
+Condiciones de satisfacción:
+- Poder cambiar la contraseña por medio del mail
+- Recuperar la contraseña por medio del mail
+
+
+
+
+
+
+
+
+
+

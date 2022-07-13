@@ -1,0 +1,60 @@
+
+<br>
+<div class="columns" align="center">
+    <% choices = ["cc", "sj", "lc", "co", "meones"] %>
+    <% p1, p2 = ["cc", "meones"].sample(2) %>
+    <% p3, p4 = ["sj", "lc", "co"].sample(2)%>
+    <div class="column is-offset-1">
+      <div class="columns features" style="height: 50%;">
+        <div class="column" id="parallax-<%=p1%>" style="background-size: 600px 650px; background-position: left center;">
+        </div>
+        <div class="column" id="parallax-<%=p2%>" style="background-size: 600px 650px; background-position: center center;">
+        </div>
+      </div>
+      <div class="columns features" style="height: 50%;">
+        <div class="column" id="parallax-<%=p3%>" style="background-size: 600px 650px; background-position: left center; border-bottom: 20px solid hsl(48, 100%, 67%); border-top-color: transparent;">
+        </div>
+        <div class="column" id="parallax-<%=p4%>" style="background-size: 600px 650px; background-position: center center; border-bottom: 20px solid hsl(48, 100%, 67%); border-top-color: transparent;">
+        </div>
+      </div>
+    </div>
+    <div class="column is-1">
+    </div>
+    <div class="column is-one-quarter">
+      <br>
+      <br>
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+        <div class="column box" align="left">
+          <div class="title is-3" align="center">Inicia Sesión</div>
+            <div class="ml-3", class="field">
+              <h3 class="label"><%= f.label :email %><br />
+              <%= f.email_field :email, autofocus: true, autocomplete: "email", :class=>"input mb-4", :type=>"text", :placeholder=>"Email" %>
+            </div>
+
+            <div class="ml-3", class="field">
+              <h3 class="label"> Contraseña <br />
+              <%= f.password_field :password, autocomplete: "current-password", :class=>"input mb-4", :placeholder=>"Contraseña" %>
+            </div>
+        </div>
+        <br>
+        <% if devise_mapping.rememberable? %>
+          <div class="ml-3", class="field">
+            <%= f.check_box :remember_me %>
+            Recuérdame
+          </div>
+        <% end %>
+
+        <div class="ml-3", class="actions">
+          <%= f.submit "Iniciar sesión", :class=> "button is-info mb-2 mt-2"  %>
+        </div>
+      <% end %>
+      <div class="ml-3", class="">
+        <div align="center">
+          <%= link_to "Administrador", admin_login_path %>
+        </div>
+        <%= render "users/shared/links" %>
+      </div>
+    </div>
+    <div class="column is-1">
+    </div>
+</div>

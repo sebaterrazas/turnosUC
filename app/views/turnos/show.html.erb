@@ -1,0 +1,556 @@
+<style>
+
+  .sb-title {
+    position: relative;
+    top: -12px;
+    font-family: Roboto, sans-serif;
+    font-weight: 500;
+  }
+
+  .sb-title-icon {
+    position: relative;
+    top: -5px;
+  }
+
+  .card-container {
+    display: flex;
+    height: 500px;
+    width: 600px;
+  }
+
+  .panel {
+    background: white;
+    width: 300px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+
+  .half-input-container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .half-input {
+    max-width: 120px;
+  }
+
+  .map {
+    width: 600px;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: Roboto, sans-serif;
+  }
+
+  input {
+    height: 30px;
+  }
+
+  input {
+    border: 0;
+    border-bottom: 1px solid black;
+    font-size: 14px;
+    font-family: Roboto, sans-serif;
+    font-style: normal;
+    font-weight: normal;
+  }
+
+  input:focus::placeholder {
+    color: white;
+  }
+
+  .button-cta {
+    height: 40px;
+    width: 40%;
+    background: #3367d6;
+    color: white;
+    font-size: 15px;
+    text-transform: uppercase;
+    font-family: Roboto, sans-serif;
+    border: 0;
+    border-radius: 3px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.48);
+    cursor: pointer;
+  }
+</style>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+<br>
+<div class="columns">
+    <aside class="column is-4">
+        <div class="box">
+            <div class="container is-fluid is-dark" align="center">
+                <figure class="image">
+                    <%= image_tag(@turno.driver.display_avatar, :class=>"is-rounded", style: "max-height: 120px; width: auto;") %>
+                </figure>
+                <div class="title is-4">
+                    Turno de <%= link_to @turno.driver.username, users_show_path(@turno.driver.id), method: :get %>
+                </div>
+                <table class="table">
+                    <tr class="ml-3">
+                        <td align="right"><strong> Fecha: </strong></td>
+                        <td align="left"><%= @turno.datetime.strftime("%d %b") %></td>
+                        <td></td>
+                        <td align="right"><strong> Hora: </strong></td>
+                        <td align="left"><%= @turno.datetime.strftime("%k:%M") %></td>
+                    </tr>
+                    <tr class="ml-3">
+                        <td align="right"><strong> Desde: </strong></td>
+                        <td align="left" <% if @turno.is_it_return %> id="turno_departure_address" <% else %> id="location" <% end %> > <%= @turno.departure_address %></td>
+                        <td></td>
+                        <td align="right"><strong> Hasta: </strong></td>
+                        <td align="left" <% if @turno.is_it_return %> id="location" <% else %> id="turno_arrival_address" <% end %> > <%= @turno.arrival_address%></td>
+                    </tr>
+                </table> 
+            <div>
+                <% if @turno.driver == current_user%>
+                    <% if @turno.status == 'Scheduled'%>
+                        <%= link_to("Empezar Viaje", turnos_update_path(params: {turno: {status: "Travelling", id: @turno.id}}), method: :patch, :class => "button is-warning has-text-info-dark is-small") %>
+                        <%= link_to("Editar Turno", turnos_edit_path(:id => @turno.id), :class => "button is-info is-outlined is-small") %>
+                    <% elsif @turno.status == 'Travelling'%>
+                        <div class="tag is-info is-rounded">Viaje en transcurso&ensp;<div class="loader"></div></div>
+                        <%= link_to("Finalizar Viaje", turnos_update_path(params: {turno: {status: "Finished", id: @turno.id}}), method: :patch, :class => "button is-warning has-text-info-dark is-small") %>
+                    <% elsif @turno.status == 'Finished'%>
+                        <div class="tag is-success is-light is-rounded"> Viaje finalizado </div>
+                    <% end %>
+                <% else %>
+                    <% if @turno.status == 'Scheduled' %>
+                        <% if @turno.recieved_requests.where(state: 'Pending').map {|x| x.requester}.include? current_user %>
+                            <div class="tags has-addons">
+                                <div class="tag is-info is-rounded" align="center">Solicitud enviada</div>
+                                <%= link_to requests_delete_path(Request.find_by(turno: @turno, requester: current_user).id), method: :delete, :class => "tag button is-danger is-outlined is-small is-rounded", style: "text-decoration: none;" do %>
+                                    <span class="icon">
+                                        <i class="fas fa-close"></i>
+                                    </span>
+                                <% end %>
+                            </div>
+                        <% elsif @turno.recieved_requests.where(state: 'Accepted').map {|x| x.requester}.include? current_user %>
+                            <%= button_to "Salir del Viaje", requests_delete_path(Request.find_by(turno: @turno, requester: current_user).id), method: :delete, :class => "button is-danger is-small is-light" %>
+                        <% elsif @turno.recieved_requests.where(state: 'Rejected').map {|x| x.requester}.include? current_user %>
+                            <div class="tag is-danger is-light is-rounded"><%= 'Solicitud rechazada' %></div>
+                        <% else %>
+                            <% if @turno.full? %>
+                                <div class="tag is-danger is-light is-rounded"><%= 'El turno está lleno' %></div>
+                            <% else %>
+                                <span class="button is-warning has-text-info-dark is-small is-rounded modal-button" data-target=<%= "modal-card-new-request" %>> Solicitar unirse </span>
+                            <% end %>
+                        <% end %>
+                    <% elsif @turno.status == 'Travelling'%>
+                        <div class="tag is-info is-rounded">Viaje en transcurso&ensp;<div class="loader"></div></div>
+                    <% elsif @turno.status == 'Finished'%>
+                        <% if @turno.recieved_requests.where(state: 'Accepted').map {|x| x.requester}.include? current_user %>
+                            <%= link_to "Evalúa el viaje", reviews_new_path(:turno_id => @turno.id), :class => "button is-warning has-text-info-dark is-small is-rounded"%>
+                        <% end %>
+                        <div class="tag is-success is-light is-rounded"><%= 'Viaje finalizado' %></div>
+                    <% end %>
+                <% end %>
+            </div>
+        </div>
+    </aside>
+    <div class="column is-8">
+    <div class="box">
+        <div class="tabs is-boxed is-centered" id="nav">
+            <ul>
+                <li data-target="pane-4" id="4">
+                    <a>
+                        <span class="icon is-small"><i class="fa-solid fa-map-location-dot"></i></span>
+                        <span><strong> Mapa </strong></span>
+                    </a>
+                </li>
+                <li data-target="pane-1" id="1" <% unless (@turno.driver == current_user) || (@passengers.include? current_user) %> class="is-active" <% end %> >
+                    <a>
+                        <span class="icon is-small"><i class="fa-solid fa-people-group"></i></span>
+                        <span><strong> Pasajeros: </strong> (<%= @turno.passengers.count%> / <%= @turno.seats %>)</span>
+                    </a>
+                </li>
+                <% if current_user == @turno.driver && @turno.status == 'Scheduled' %>
+                <li data-target="pane-2" id="2" >
+                    <a>
+                        <span class="icon is-small"><i class="fa-solid fa-person-arrow-up-from-line"></i></span>
+                        <span>Solicitudes (<%= @turno.recieved_requests.where(state: "Pending").count %>)</span>
+                    </a>
+                </li>
+                <% end%>
+                <% if (@turno.driver == current_user) || (@passengers.include? current_user) %>
+                <li data-target="pane-3" id="3" class="is-active">
+                    <a>
+                        <span class="icon is-small"><i class="fa-brands fa-facebook-messenger"></i></span>
+                        <span>Chat (<%= @turno.messages.count%>)</span>
+                    </a>
+                </li>
+                <% end %>
+            </ul>
+        </div>
+
+        <div class="tab-content" style="height: 100%;">
+            <div class="tab-pane  <% unless (@turno.driver == current_user) || (@passengers.include? current_user) %> is-active <% end %>" id="pane-1">
+                <section class="container scrolling-wrapper">
+                    <div class="columns" style="height: 80%;">
+                    <% @passengers.each do |user| %>
+                        <div class="column is-two-fifths">
+                            <div class="card is-shady has-background-info-light">
+                                <% if current_user == @turno.driver && @turno.status == "Scheduled" %>
+                                    <% user_request = Request.find_by(requester: user, turno: @turno) %>
+                                    <%= button_to requests_reject_path(user_request.id), method: :patch, :class => "button is-danger is-outlined is-rounded" do %>
+                                        <span class="icon">
+                                            <i class="fas fa-close"></i>
+                                        </span>
+                                    <% end %>
+                                <% end %>
+                                <div class="card-image outer">
+                                <figure class="image is-4by3"  style="margin: auto;">
+                                    <%= image_tag(user.display_avatar, :class=>"is-rounded", style: "max-width: 80%; max-height: 95%; width: auto; margin: auto;") %>
+                                </figure>
+                                </div>
+                                <div class="card-content">
+                                <div class="content">
+                                    <h4><%=user.username%></h4>
+                                    <p></p>
+                                    <%= button_to "Ver Perfil", users_show_path(user.id), method: :get, :class=>"button is-small is-warning" %>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% end %>
+                    <div>
+                </section>
+            </div>
+            <div class="tab-pane" id="pane-2">
+                <table class="table is-striped is-hoverable" align="center" style="width:600px; overflow:auto">
+                <% for req in @pending_requests %>
+                <tr>
+                    <td> 
+                        <figure class="image is-32x32">
+                            <%= image_tag(req.requester.display_avatar, :class=>"is-rounded", style: "max-height: 38px; width: auto;") %>
+                        </figure>
+                    </td>
+                    <td class="is-vcentered", align="left"> <%=req.requester.username%> </td>
+                    <td class="is-vcentered"> <em> <%= req.description%> </em> </td>
+                    <td class="is-vcentered", align="right"><%= button_to "Ver Perfil", users_show_path(req.requester.id), method: :get, :class=>"button is-small is-info is-light" %></td>
+                    <td><%= button_to "Aceptar", requests_accept_path(req.id), method: :patch, :class => "button is-info is-small is-rounded", :disabled => @turno.full? %></td>
+                    <td><%= button_to "Rechazar", requests_reject_path(req.id), method: :patch, :class => "button is-danger is-small is-light is-rounded" %></td>
+                </tr>
+                <% end %>
+                </table>
+            </div>
+            <div class="tab-pane <% if (@turno.driver == current_user) || (@passengers.include? current_user) %> is-active <% end %>"  id="pane-3">
+                <%= render 'chat', turno: @turno %>
+                <%= form_tag(messages_create_path(:turno_id => @turno.id, :user_id => current_user.id), method: "post", class: "has-background-info", autocomplete:"off", style: "height: 50px; border-radius: 0 0 20px 20px;") do %>
+                    <input class="input is-rounded" type="text" name="text" id="text" autocomplete="false" placeholder="Chatea" style="max-width: 50%; height: 50%; top: 20%;">
+                    <%= button_tag(type: "submit", :class => "button is-warning is-rounded is-small is-outlined", style: "top: 15%;") do %>
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <% end %>
+                <% end %>
+            </div>
+            <div class="tab-pane" id="pane-4">
+                <div class="card-container">
+                    <div class="map" id="gmp-map"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+
+
+<script>
+    document.querySelectorAll("#nav li").forEach(function(navEl) {
+        navEl.onclick = function() { toggleTab(this.id, this.dataset.target); }
+    });
+
+    function toggleTab(selectedNav, targetId) {
+        var navEls = document.querySelectorAll("#nav li");
+
+        navEls.forEach(function(navEl) {
+        if (navEl.id == selectedNav) {
+        navEl.classList.add("is-active");
+        } else {
+        if (navEl.classList.contains("is-active")) {
+            navEl.classList.remove("is-active");
+        }
+        }
+        });
+
+        var tabs = document.querySelectorAll(".tab-pane");
+
+        tabs.forEach(function(tab) {
+            if (tab.id == targetId) {
+            tab.style.display = "block";
+            } else {
+            tab.style.display = "none";
+            }
+        });
+    }
+</script> 
+
+
+
+<!--  ===============
+HERE BE MODALS
+===============  -->
+<!-- 3dFlipVertical card tiny -->
+<div id=<%= "modal-card-new-request" %>  class="modal modal-fx-3dSlit" align="center">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="column box has-background-info has-text-white is-half" align="left">
+            <p class="title is-4 has-text-warning">Solicita unirte</p>
+            <%= render 'reqform', request: @request %>
+        </div>
+    </div>
+    <!-- end content -->
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>
+<!-- end tiny modal card -->
+
+
+
+<script src="https://unpkg.com/bulma-modal-fx/dist/js/modal-fx.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.9.1/js/OverlayScrollbars.min.js'></script>  
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+    //The first argument are the elements to which the plugin shall be initialized
+    //The second argument has to be at least a empty object or a object with your desired options
+    OverlayScrollbars(document.querySelectorAll("body"), { });
+    });
+    </script> 
+
+
+<script>
+"use strict";
+
+function initMap() {
+    var old_destination = "";
+    const STROKE_COLORS = {
+        active: {
+          innerStroke: '#4285F4',
+          outerStroke: '#185ABC',
+        },
+        inactive: {
+          innerStroke: '#4285F4',
+          outerStroke: '#185ABC',
+        },
+      };
+  const CONFIGURATION = {
+    "ctaTitle": "Revisar",
+    "mapOptions": {"center":{"lat":37.4221,"lng":-122.0841},"fullscreenControl":true,"mapTypeControl":false,"streetViewControl":true,"zoom":10.25,"zoomControl":true,"maxZoom":22},
+    "mapsApiKey": "AIzaSyCLLhdVtqnFwiDxX6jQdPBbF8IIoTcffBs",
+    "capabilities": {"addressAutocompleteControl":true,"mapDisplayControl":true,"ctaControl":true}
+  };
+  const componentForm = [
+    'location',
+    'locality',
+    'administrative_area_level_1',
+    'country',
+    'postal_code',
+  ];
+
+  const map = new google.maps.Map(document.getElementById("gmp-map"), {
+    zoom: CONFIGURATION.mapOptions.zoom,
+    center: { lat: -33.45, lng: -70.63 },
+    mapTypeControl: false,
+    fullscreenControl: CONFIGURATION.mapOptions.fullscreenControl,
+    zoomControl: CONFIGURATION.mapOptions.zoomControl,
+    streetViewControl: CONFIGURATION.mapOptions.streetViewControl
+  });
+  const marker = new google.maps.Marker({map: map, draggable: false, title: "Casa"});
+  const marker2 = new google.maps.Marker({map: map, draggable: false, title: "Campus"});
+  if (document.getElementById("turno_arrival_address")) {
+    var id = "turno_arrival_address";
+  } else {
+    var id = "turno_departure_address";
+  }
+    var location = document.getElementById(id).innerText;
+    if (location == "San Joaquín") {
+        var coords = {lat: -33.4994535, lng: -70.6142583};
+    } else if (location == "Casa Central") {
+        var coords = {lat: -33.441059, lng: -70.641644};
+    } else if (location == "Lo Contador") {
+        var coords = {lat: -33.4196214, lng: -70.6182547};
+    } else {
+        var coords = {lat: -33.4459433, lng: -70.5942718};
+    } 
+    marker2.setPosition(coords);
+    marker2.setVisible(true);
+
+  const autocompleteInput = document.getElementById('location');
+  const autocomplete = new google.maps.places.Autocomplete(autocompleteInput, {
+    fields: ["address_components", "geometry", "name"],
+    types: ["address"],
+  });
+  geocode1();
+  autocomplete.addListener('place_changed', function () {
+    marker.setVisible(false);
+    const place = autocomplete.getPlace();
+    if (!place.geometry) {
+      // User entered the name of a Place that was not suggested and
+      // pressed the Enter key, or the Place Details request failed.
+      window.alert('No se encontró la dirección: \'' + place.name + '\'');
+      return;
+    }
+    renderAddress(place);
+  });
+
+  function renderAddress(place) {
+    // map.setCenter(place.geometry.location);
+    var location = document.getElementById(id).innerText;
+    if (location == "San Joaquín") {
+        var coords = {lat: -33.4994535, lng: -70.6142583};
+    } else if (location == "Casa Central") {
+        var coords = {lat: -33.441059, lng: -70.641644};
+    } else if (location == "Lo Contador") {
+        var coords = {lat: -33.4196214, lng: -70.6182547};
+    } else {
+        var coords = {lat: -33.4459433, lng: -70.5942718};
+    } 
+    marker2.setPosition(coords);
+    marker2.setVisible(true);
+    marker.setPosition(place.geometry.location);
+    marker.setVisible(true);
+    geocode1();
+  }
+
+  function geocode1(place) {
+    location = document.getElementById('location').innerText;
+    axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
+      params: {
+        address: location,
+        key: 'AIzaSyCLLhdVtqnFwiDxX6jQdPBbF8IIoTcffBs'
+      }
+    })
+    .then(function(response) {
+      marker.setPosition(response.data.results[0].geometry.location);
+      marker.setVisible(true);
+      getDirections()
+                .then((response) => {
+                if (!response) return;
+                getCommutesInfo(response);
+                })
+                .catch((e) => console.error('Adding destination failed due to ' + e));
+    })
+    .catch(function(error){
+      console.log(error);
+    });
+  }
+  function geocode2() {
+    if (document.getElementById("turno_arrival_address")) {
+    var id = "turno_arrival_address";
+  } else {
+    var id = "turno_departure_address";
+  }
+    var location = document.getElementById(id).innerText;
+    axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
+      params: {
+        address: location,
+        key: 'AIzaSyCLLhdVtqnFwiDxX6jQdPBbF8IIoTcffBs'
+      }
+    })
+    .then(function(response) {
+      marker2.setPosition(response.data.results[0].geometry.location);
+      marker2.setVisible(true);
+    })
+    .catch(function(error){
+      console.log(error);
+    });
+  }
+
+  function createDestinationConfig(destinationToAdd) {
+  const markerLabels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const destinationConfig = {
+  name: destinationToAdd.name,
+  place_id: destinationToAdd.place_id,
+  travelMode: "DRIVING",
+  };
+  return destinationConfig;
+  }
+    /**
+     * Gets directions to destination from origin, add route to map view, and
+     * update commutes panel with distance and directions info.
+     */
+  function getDirections() {
+    const request = {
+    origin: marker2.position,
+    destination: marker.position,
+    travelMode: "DRIVING",
+    unitSystem: google.maps.UnitSystem.METRIC
+    };
+    const directionsService = new google.maps.DirectionsService();
+    return directionsService.route(request).then(response => {
+    return response;
+    });
+    }
+
+    /**
+     * Adds route polyline, marker, and commutes info to map and destinations
+     * list.
+     */
+    function getCommutesInfo(directionResponse, destination) {
+        if (!directionResponse) return;
+        const path = directionResponse.routes[0].overview_path;
+        const bounds = directionResponse.routes[0].bounds;
+        const directionLeg = directionResponse.routes[0].legs[0];
+        const destinationLocation = directionLeg.end_location;
+        const distance = directionLeg.distance.text;
+        const duration = convertDurationValueAsString(directionLeg.duration.value);
+
+        const innerStroke = new google.maps.Polyline({
+        path: path,
+        strokeColor: STROKE_COLORS.inactive.innerStroke,
+        strokeOpacity: 1.0,
+        strokeWeight: 3,
+        zIndex: 10
+        });
+
+        const outerStroke = new google.maps.Polyline({
+        path: path,
+        strokeColor: STROKE_COLORS.inactive.outerStroke,
+        strokeOpacity: 1.0,
+        strokeWeight: 6,
+        zIndex: 1
+        });
+
+        // const marker = createMarker(destinationLocation, destination.label);
+
+        innerStroke.setMap(map);
+        outerStroke.setMap(map);
+
+        if (old_destination !== '') {
+            old_destination.polylines.innerStroke.setMap(null);
+            old_destination.polylines.outerStroke.setMap(null);
+        }
+        destination = marker
+        destination.polylines = {innerStroke, outerStroke};
+        destination.bounds = bounds;
+        old_destination = destination;
+    }
+     /**
+     * Convert time from durationValue in seconds into readable string text.
+     */
+    function convertDurationValueAsString(durationValue) {
+        if (!durationValue) {
+        return '';
+        }
+        if (durationValue < 60) {
+        return '<1 min';
+        }
+        if (durationValue > 60*60 * 10) {
+        return '10+ hours';
+        }
+        const hours = Math.floor(durationValue / 60*60);
+        const minutes = Math.floor(durationValue % 60*60 / 60);
+        const hoursString = hours > 0 ? hours + ' h' : '';
+        const minutesString = minutes > 0 ? minutes + ' min' : '';
+        const spacer = hoursString && minutesString ? ' ' : '';
+        return hoursString + spacer + minutesString;
+    }
+}
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLLhdVtqnFwiDxX6jQdPBbF8IIoTcffBs&callback=initMap&libraries=places,geometry&solution_channel=GMP_QB_commutes_v1_c" async defer></script>
+

@@ -1,0 +1,215 @@
+<script src="https://kit.fontawesome.com/15181efa86.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/bulma-modal-fx/dist/js/modal-fx.min.js"></script>
+
+<% choices = ["cc", "sj", "lc", "co"] %>
+<% p1 = choices.sample %>
+<% choices.delete(p1) %>
+<section id="parallax-<%= p1 %>" class="hero is-large ">
+    <div class="hero-body">
+    <div class="container">
+        <div class="columns">
+        <div class="column is-6 is-offset-3">
+            <%= image_tag("logo_sombra.png") %>
+            <hr class="content-divider">
+            <%= link_to turnos_new_path, :class => "button is-info is-inverted" do %>
+                Crear Viaje&ensp;<i class="fa fa-plus"></i>
+            <% end %>
+            &ensp;
+            <a href="#turnos" class="button is-info is-inverted">Viajes&ensp;<i class="fad fa-chevron-right"></i></a>
+            <% if current_user %>
+                &ensp;
+                <a href="#calendario" class="button is-info is-inverted">Calendario&ensp;<i class="fad fa-chevron-right"></i></a>
+            <% end %>
+        </div>
+        </div>
+    </div>
+    </div>
+</section>
+
+<div id="turnos">
+<section id="parallax" class="hero">
+    <div class="hero-body">
+    <div class="container">
+        <br>
+
+        <div class="title is-2"><b> Viajes disponibles</b> </div>
+        <div class="columns" style="width: 100%; margin: auto;">
+            <div class="column">
+                <div class="title is-4 has-text-info"><i class="fa-solid fa-filter has-text-warning"></i> <b>Filtros</b></div>
+                <div class="tags">
+                    <% if params[:time] || params[:date] || !params[:scheduled] || !params[:travelling] || !params[:finished] %>
+                        <% if params[:scheduled] %>
+                            <span class="tag is-info">
+                                Agendado
+                                <a class="delete is-small" href="<%=turnos_index_path(travelling: params[:travelling], finished: params[:finished], time: params[:time], date: params[:date], departure_address: params[:departure_address], arrival_address: params[:arrival_address])%>#turnos" ></a>
+                            </span>
+                        <% end %>
+                        <% if params[:travelling] %>
+                            <span class="tag is-info">
+                                Viajando
+                                <a class="delete is-small" href="<%=turnos_index_path(finished: params[:finished], scheduled: params[:scheduled], time: params[:time], date: params[:date], departure_address: params[:departure_address], arrival_address: params[:arrival_address])%>#turnos" ></a>
+                            </span>
+                        <% end %>
+                        <% if params[:finished] %>
+                            <span class="tag is-info">
+                                Finalizado
+                                <a class="delete is-small" href="<%=turnos_index_path(scheduled: params[:scheduled], travelling: params[:travelling], time: params[:time], date: params[:date], departure_address: params[:departure_address], arrival_address: params[:arrival_address])%>#turnos" ></a>
+                            </span>
+                        <% end %>
+                    <% else %>
+                        <span class="tag is-info">
+                            Agendado
+                            <a class="delete is-small" href="<%=turnos_index_path(travelling: params[:travelling], finished: params[:finished])%>#turnos" ></a>
+                        </span>
+                        <span class="tag is-info">
+                            Viajando
+                            <a class="delete is-small" href="<%=turnos_index_path(finished: params[:finished], scheduled: params[:scheduled])%>#turnos" ></a>
+                        </span>
+                        <span class="tag is-info">
+                            Finalizado
+                            <a class="delete is-small" href="<%=turnos_index_path(travelling: params[:travelling], scheduled: params[:scheduled])%>#turnos" ></a>
+                        </span>
+                    <% end %>
+                    <% if params[:time] && params[:time] != ""  %>
+                        <span class="tag is-info">
+                            <%= params[:time] %>
+                            <a class="delete is-small" href="<%=turnos_index_path(travelling: params[:travelling], finished: params[:finished], scheduled: params[:scheduled], date: params[:date], departure_address: params[:departure_address], arrival_address: params[:arrival_address])%>#turnos" ></a>
+                        </span>
+                    <% end %>
+                    <% if params[:date] && params[:date] != "" %>
+                        <span class="tag is-info">
+                            <%= params[:date] %>
+                            <a class="delete is-small" href="<%=turnos_index_path(travelling: params[:travelling], finished: params[:finished], scheduled: params[:scheduled], time: params[:time], departure_address: params[:departure_address], arrival_address: params[:arrival_address])%>#turnos" ></a>
+                        </span>
+                    <% end %>
+                    <% if params[:departure_address] && params[:departure_address] != "" %>
+                        <span class="tag is-info">
+                            <%= params[:departure_address] %>
+                            <a class="delete is-small" href="<%=turnos_index_path(travelling: params[:travelling], finished: params[:finished], scheduled: params[:scheduled], time: params[:time], date: params[:date], arrival_address: params[:arrival_address])%>#turnos" ></a>
+                        </span>
+                    <% end %>
+                    <% if params[:arrival_address] && params[:arrival_address] != "" %>
+                        <span class="tag is-info">
+                            <%= params[:arrival_address] %>
+                            <a class="delete is-small" href="<%=turnos_index_path(travelling: params[:travelling], finished: params[:finished], scheduled: params[:scheduled], time: params[:time], date: params[:date], departure_address: params[:departure_address])%>#turnos" ></a>
+                        </span>
+                    <% end %>
+                </div>
+                <%= form_tag("/turnos/#turnos", method: "get") do %>
+                    <div class="column is-offset-3" align="left">
+                        <label class="checkbox">
+                            <%= check_box_tag :scheduled, "Scheduled", ( params[:time] || params[:date] ) ? params[:scheduled] : true %>
+                            Agendado
+                        </label>
+                        <br>
+                        <label class="checkbox">
+                            <%= check_box_tag :travelling, "Travelling", ( params[:time] || params[:date] ) ? params[:travelling] : true %>
+                            Viajando
+                        </label>
+                        <br>
+                        <label class="checkbox">
+                            <%= check_box_tag :finished, "Finished", ( params[:time] || params[:date] ) ? params[:finished] : true %>
+                            Finalizado
+                        </label>
+                        <br>
+                    </div>
+                    <div class="columns">
+                        <div class="column">
+                            <label class="label">Hora</label>
+                            <div class="control">
+                                <%= time_field_tag :time, params[:time] %>
+                            </div>
+                        </div>
+                        
+                        <div class="column">
+                            <label class="label">Día</label>
+                            <div class="control">
+                                <%= date_field_tag :date, params[:date] %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Partida</label>
+                        <div class="control">
+                            <%= text_field_tag :departure_address, params[:departure_address] %>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Destino</label>
+                        <div class="control">
+                            <%= text_field_tag :arrival_address, params[:arrival_address] %>
+                        </div>
+                    </div>
+                    <%= submit_tag("Buscar", :class => "button is-white is-rounded is-small is-outlined is-inverted") %>
+                <% end %>
+            </div>
+
+            <div class="column is-three-quarters" style="overflow:auto; max-height: 580px;">
+                <% n = 0 %>
+                <% @filtered_turnos.each do |turno| %>
+                    <% n += 1 %>
+                    <% if n % 3 == 1 %> <div class="columns features"> <% end %>
+                        <div class="column is-4">
+                        <a href=<%= "#{turnos_show_path(turno.id)}"%>>
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="media">
+                                <div class="media-content">
+                                    <p class="titulo2"> De </p><p class="titulo"><%= turno.departure_address %></p><p class="titulo2"> a </p><p class="titulo"> <%= turno.arrival_address %></p><br>
+                                    <p class="subtitle is-6"><%= turno.datetime.strftime("%k:%M - %e de %b del %Y") %>
+                                        <% if turno.status == "Scheduled" %>
+                                            <div class="tag is-success is-light is-rounded">Agendado<% if turno.status =="Travelling" %> &ensp;<div class="loader"></div><% end %> </div>
+                                        <% elsif turno.status == "Finished" %>
+                                            <div class="tag is-danger is-light is-rounded">Finalizado<% if turno.status =="Travelling" %> &ensp;<div class="loader"></div><% end %> </div>
+                                        <% elsif turno.status == "Travelling" %>
+                                            <div class="tag is-info is-rounded">Viajando<% if turno.status =="Travelling" %> &ensp;<div class="loader"></div><% end %> </div>
+                                        <% end %>
+                                    </p>
+                                </div>
+                                </div>
+                                <div class="content">
+                                <b>Pasajeros:</b> <%= "#{turno.passengers.count} / #{turno.seats}" %><br>
+                                <b><%= "Conductor: "%></b> <br> <%="#{turno.driver.username}" %> <br>
+                                <figure class="image" style="margin: auto;">
+                                    <%= image_tag(turno.driver.display_avatar, class: "is-rounded", style: "max-height: 60px; width: auto;" ) %>
+                                </figure>
+                                </div>
+                            </div>
+                            <%= button_to "Ver Turno", turnos_show_path(turno.id), method: :get, :class => "button is-light is-info"%>
+                            <br>
+                            </div>
+                        </a>
+                        </div>
+                    <% if n % 3 == 0 %> </div> <% end %>
+                <% end %>
+            <% if n % 3 != 0 %> </div> <% end %>
+        </div>
+    </div>
+    </div>
+</section>
+</div>
+<% if current_user %>
+    <% p2 = choices.sample %>
+    <% choices.delete(p2) %>
+    <section id="parallax-<%= p2 %>"  class="hero is-medium">
+        <div class="hero-body" id="calendario">
+            <div class="container">
+                <div class='box mis-viajes' align='center' style="width: 90%; margin:auto;">
+                    <div class="title is-4"> 
+                        <div style="font-weight: bold;">
+                            Tus Viajes del Mes
+                        </div>
+                    </div>
+                    <div class="title is-5"> 
+                        <div id="events_calendar" style="max-width: 100%;">
+                            <%= render partial: "calendar" %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+<% end %>
+
+</section>

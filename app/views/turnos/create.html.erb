@@ -1,0 +1,21 @@
+<h1>Turnos#show pero por mientra</h1>
+<p>
+    <strong> Conductor: </strong>
+    <% @turno.driver %> 
+</p>
+<p>
+    <strong> Pasajeros (<%= lenght(@turno.users) - 1 %> / <%= @turno.seats - 1 %>): </strong>
+    <ol>
+        <% for pasajero in @turno.users %>
+            <li> <%= pasajero.username %>
+        <% end %>
+    </ol>
+</p>
+<% if current_user == @turno.driver %>
+    <%= button_to "Ver Solicitudes", turnos_index_path, method: :get %>
+    <%= button_to "Eliminar turno", turnos_index_path, method: :get %>
+<% elsif current_user in @turno.users %>
+    <%= link_to "Salir del Turno", root_path %>
+<% else %>
+    <%= button_to "Solicitar unirse", turnos_index_path, method: :get %>
+<% end %>

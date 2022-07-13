@@ -1,0 +1,428 @@
+<style>
+
+  .sb-title {
+    position: relative;
+    top: -12px;
+    font-family: Roboto, sans-serif;
+    font-weight: 500;
+  }
+
+  .sb-title-icon {
+    position: relative;
+    top: -5px;
+  }
+
+  .card-container {
+    display: flex;
+    height: 500px;
+    width: 600px;
+  }
+
+  .panel {
+    background: white;
+    width: 300px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+
+  .half-input-container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .half-input {
+    max-width: 120px;
+  }
+
+  .map {
+    width: 600px;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: Roboto, sans-serif;
+  }
+
+  input {
+    height: 30px;
+  }
+
+  input {
+    border: 0;
+    border-bottom: 1px solid black;
+    font-size: 14px;
+    font-family: Roboto, sans-serif;
+    font-style: normal;
+    font-weight: normal;
+  }
+
+  input:focus::placeholder {
+    color: white;
+  }
+
+  .button-cta {
+    height: 40px;
+    width: 40%;
+    background: #3367d6;
+    color: white;
+    font-size: 15px;
+    text-transform: uppercase;
+    font-family: Roboto, sans-serif;
+    border: 0;
+    border-radius: 3px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.48);
+    cursor: pointer;
+  }
+</style>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<div class="titulo title is-3">Crea un turno</div>
+<div align="center">
+    <%= form_with(model: @turno, method: :post) do |form| %>
+        <div class="columns">
+            <div class="column is-offset-1">
+                <div class="card-container">
+                    <div class="map" id="gmp-map"></div>
+                </div>
+            </div>
+            <div class="column is-one-quarter">
+                <div class="column box" align="left">
+                    <h3 class="label"><i>Tipo de viaje:
+                    <% if params[:format]  == 'vuelta'%>
+                    Vuelta
+                    <% ida_is_outline = "is-outlined"%>
+                        <% vuelta_is_outline = ""%>
+                    <% else %>
+                        Ida
+                        <% ida_is_outline = ""%>
+                        <% vuelta_is_outline = "is-outlined"%>
+                    <% end %>
+                    </i></h3>
+
+                    <%= link_to "Ida", turnos_new_path('ida'), method: :get, :class => "button is-info #{ida_is_outline} is-small is-rounded" %>
+                    <%= link_to "Vuelta", turnos_new_path('vuelta'), method: :get, :class => "button is-info #{vuelta_is_outline} is-small is-rounded" %>
+
+                    <div class="field">
+                        <%= form.label :Fecha_de_salida, :class => "label" %>
+                        <%= form.datetime_field :datetime, min: DateTime.current.strftime("%d-%m-%Y %H:%M") %>
+                    </div>
+                    <div class="field">
+                        <%= form.label :Dirección_de_partida, :class => "label" %>
+                        <% if params[:format]  == 'vuelta'%>
+                            <div class="control">
+                                <%= form.hidden_field :is_it_return, value: 1 %>
+                                <div class="select">
+                                <select name="turno[departure_address]" id="turno_departure_address" class="departure">
+                                    <option value="San Joaquín">San Joaquín</option>
+                                    <option value="Lo Contador">Lo Contador</option>
+                                    <option value="Campus Oriente">Campus Oriente</option>
+                                    <option value="Casa Central">Casa Central</option>
+                                </select>
+                                </div> 
+                            </div>
+                        <% else %>
+                            <div class="control">
+                                <%= form.hidden_field :is_it_return, value: 0 %>
+                                <%= form.text_field :departure_address, :class=>"input departure", :type=>"text", :placeholder=>"Dirección", id: "location-input"%>
+                            </div>
+                        <% end %>
+                    </div>
+                    <div class="field">
+                        <%= form.label :Dirección_de_llegada, :class => "label" %>
+                        <% if params[:format]  == 'vuelta'%>
+                            <div class="control">
+                                <%= form.hidden_field :is_it_return, value: 1 %>
+                                <%= form.text_field :arrival_address, :class=>"input", :type=>"text", :placeholder=>"Dirección", id: "location-input"%>
+                            </div>
+                        <% else %>
+                            <div class="control">
+                            <%= form.hidden_field :is_it_return, value: 0 %>
+                                <div class="select">
+                                <select name="turno[arrival_address]" id="turno_arrival_address">
+                                    <option value="San Joaquín">San Joaquín</option>
+                                    <option value="Lo Contador">Lo Contador</option>
+                                    <option value="Campus Oriente">Campus Oriente</option>
+                                    <option value="Casa Central">Casa Central</option>
+                                </select>
+                                </div>
+                            </div>
+                        <% end %>
+                    </div>
+
+                    <div class="field">
+                        <%= form.label :Asientos, :class => "label" %>
+                        <%= form.number_field :seats, in: 1..6, step: 1 %>
+                    </div>
+                </div>
+                <div align="center">
+                    <%= form.submit 'Crear', :class => "button is-info is-outlined"%>
+                </div>
+            </div>
+            <div class="column is-1">
+            </div>
+        </div>
+    <% end %>
+</div>
+
+
+<script>
+"use strict";
+
+function initMap() {
+    var old_destination = "";
+    const STROKE_COLORS = {
+        active: {
+          innerStroke: '#4285F4',
+          outerStroke: '#185ABC',
+        },
+        inactive: {
+          innerStroke: '#4285F4',
+          outerStroke: '#185ABC',
+        },
+      };
+  const CONFIGURATION = {
+    "ctaTitle": "Revisar",
+    "mapOptions": {"center":{"lat":37.4221,"lng":-122.0841},"fullscreenControl":true,"mapTypeControl":false,"streetViewControl":true,"zoom":10.25,"zoomControl":true,"maxZoom":22},
+    "mapsApiKey": "AIzaSyCLLhdVtqnFwiDxX6jQdPBbF8IIoTcffBs",
+    "capabilities": {"addressAutocompleteControl":true,"mapDisplayControl":true,"ctaControl":true}
+  };
+  const componentForm = [
+    'location',
+    'locality',
+    'administrative_area_level_1',
+    'country',
+    'postal_code',
+  ];
+
+  const getFormInputElement = (component) => document.getElementById(component + '-input');
+  const map = new google.maps.Map(document.getElementById("gmp-map"), {
+    zoom: CONFIGURATION.mapOptions.zoom,
+    center: { lat: -33.45, lng: -70.63 },
+    mapTypeControl: false,
+    fullscreenControl: CONFIGURATION.mapOptions.fullscreenControl,
+    zoomControl: CONFIGURATION.mapOptions.zoomControl,
+    streetViewControl: CONFIGURATION.mapOptions.streetViewControl
+  });
+  const marker = new google.maps.Marker({map: map, draggable: false, title: "Casa"});
+  const marker2 = new google.maps.Marker({map: map, draggable: false, title: "Campus"});
+  if (document.getElementById("turno_arrival_address")) {
+    var id = "turno_arrival_address";
+  } else {
+    var id = "turno_departure_address";
+  }
+    var location = document.getElementById(id).value;
+    if (location == "San Joaquín") {
+        var coords = {lat: -33.4994535, lng: -70.6142583};
+    } else if (location == "Casa Central") {
+        var coords = {lat: -33.441059, lng: -70.641644};
+    } else if (location == "Lo Contador") {
+        var coords = {lat: -33.4196214, lng: -70.6182547};
+    } else {
+        var coords = {lat: -33.4459433, lng: -70.5942718};
+    } 
+    marker2.setPosition(coords);
+    marker2.setVisible(true);
+
+  const autocompleteInput = getFormInputElement('location');
+  const autocomplete = new google.maps.places.Autocomplete(autocompleteInput, {
+    fields: ["address_components", "geometry", "name"],
+    types: ["address"],
+  });
+  autocomplete.addListener('place_changed', function () {
+    marker.setVisible(false);
+    const place = autocomplete.getPlace();
+    if (!place.geometry) {
+      // User entered the name of a Place that was not suggested and
+      // pressed the Enter key, or the Place Details request failed.
+      window.alert('No se encontró la dirección: \'' + place.name + '\'');
+      return;
+    }
+    renderAddress(place);
+    fillInAddress(place);
+  });
+
+  function fillInAddress(place) {  // optional parameter
+    const addressNameFormat = {
+      'street_number': 'short_name',
+      'route': 'long_name',
+      'locality': 'long_name',
+      'administrative_area_level_1': 'short_name',
+      'country': 'long_name',
+      'postal_code': 'short_name',
+    };
+    const getAddressComp = function (type) {
+      for (const component of place.address_components) {
+        if (component.types[0] === type) {
+          return component[addressNameFormat[type]];
+        }
+      }
+      return '';
+    };
+    if (getAddressComp('street_number') !== "") {
+      getFormInputElement('location').value = getAddressComp('street_number') + ' '
+              + getAddressComp('route') + ', '
+              + getAddressComp('locality') + ', '
+              + getAddressComp('country');
+    } else {
+      getFormInputElement('location').value = getAddressComp('route') + ', '
+              + getAddressComp('locality') + ', '
+              + getAddressComp('country');
+    }
+    const destinationConfig =
+              createDestinationConfig(place);
+    getDirections(place)
+        .then((response) => {
+        if (!response) return;
+        getCommutesInfo(response, destinationConfig);
+        })
+        .catch((e) => console.error('Adding destination failed due to ' + e));
+  }
+
+  function renderAddress(place) {
+    // map.setCenter(place.geometry.location);
+    marker.setPosition(place.geometry.location);
+    marker.setVisible(true);
+  }
+
+  function geocode(location){
+    axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
+      params: {
+        address: location,
+        key: 'AIzaSyCLLhdVtqnFwiDxX6jQdPBbF8IIoTcffBs'
+      }
+    })
+    .then(function(response) {
+      marker2.setPosition(response.data.results[0].geometry.location);
+      marker2.setVisible(true);
+    })
+    .catch(function(error){
+      console.log(error);
+    });
+  }
+  function createDestinationConfig(destinationToAdd) {
+    const markerLabels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const destinationConfig = {
+    name: destinationToAdd.name,
+    place_id: destinationToAdd.place_id,
+    travelMode: "DRIVING",
+    };
+    return destinationConfig;
+    }
+
+    /**
+     * Gets directions to destination from origin, add route to map view, and
+     * update commutes panel with distance and directions info.
+     */
+  function getDirections(destination) {
+        console.log(marker2.position)
+        const request = {
+        origin: marker2.position,
+        destination: destination.geometry.location,
+        travelMode: "DRIVING",
+        unitSystem: google.maps.UnitSystem.METRIC
+        };
+        const directionsService = new google.maps.DirectionsService();
+        return directionsService.route(request).then(response => {
+        return response;
+        });
+    }
+
+    /**
+     * Adds route polyline, marker, and commutes info to map and destinations
+     * list.
+     */
+    function getCommutesInfo(directionResponse, destination) {
+        if (!directionResponse) return;
+        const path = directionResponse.routes[0].overview_path;
+        const bounds = directionResponse.routes[0].bounds;
+        const directionLeg = directionResponse.routes[0].legs[0];
+        const destinationLocation = directionLeg.end_location;
+        const distance = directionLeg.distance.text;
+        const duration = convertDurationValueAsString(directionLeg.duration.value);
+
+        const innerStroke = new google.maps.Polyline({
+        path: path,
+        strokeColor: STROKE_COLORS.inactive.innerStroke,
+        strokeOpacity: 1.0,
+        strokeWeight: 3,
+        zIndex: 10
+        });
+
+        const outerStroke = new google.maps.Polyline({
+        path: path,
+        strokeColor: STROKE_COLORS.inactive.outerStroke,
+        strokeOpacity: 1.0,
+        strokeWeight: 6,
+        zIndex: 1
+        });
+
+        // const marker = createMarker(destinationLocation, destination.label);
+
+        innerStroke.setMap(map);
+        outerStroke.setMap(map);
+
+        if (old_destination !== '') {
+            old_destination.polylines.innerStroke.setMap(null);
+            old_destination.polylines.outerStroke.setMap(null);
+        }
+
+        destination.distance = distance;
+        destination.duration = duration;
+        destination.marker = marker;
+        destination.polylines = {innerStroke, outerStroke};
+        destination.bounds = bounds;
+        old_destination = destination;
+    }
+     /**
+     * Convert time from durationValue in seconds into readable string text.
+     */
+    function convertDurationValueAsString(durationValue) {
+        if (!durationValue) {
+        return '';
+        }
+        if (durationValue < 60) {
+        return '<1 min';
+        }
+        if (durationValue > 60*60 * 10) {
+        return '10+ hours';
+        }
+        const hours = Math.floor(durationValue / 60*60);
+        const minutes = Math.floor(durationValue % 60*60 / 60);
+        const hoursString = hours > 0 ? hours + ' h' : '';
+        const minutesString = minutes > 0 ? minutes + ' min' : '';
+        const spacer = hoursString && minutesString ? ' ' : '';
+        return hoursString + spacer + minutesString;
+    }
+
+  if (document.getElementById("turno_arrival_address")) {
+    var id = "turno_arrival_address";
+  } else {
+    var id = "turno_departure_address";
+  }
+  document.getElementById(id).addEventListener("change", function(e){
+        var location = e.target.value;
+        if (location == "San Joaquín") {
+            var coords = {lat: -33.4994535, lng: -70.6142583};
+        } else if (location == "Casa Central") {
+            var coords = {lat: -33.441059, lng: -70.641644};
+        } else if (location == "Lo Contador") {
+            var coords = {lat: -33.4196214, lng: -70.6182547};
+        } else {
+            var coords = {lat: -33.4459433, lng: -70.5942718};
+        }
+        marker2.setPosition(coords);
+        marker2.setVisible(true);
+        const place = autocomplete.getPlace();
+        const destinationConfig =
+            createDestinationConfig(place);
+        getDirections(place)
+            .then((response) => {
+            if (!response) return;
+            getCommutesInfo(response, destinationConfig);
+            })
+            .catch((e) => console.error('Adding destination failed due to ' + e));
+        })
+}
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLLhdVtqnFwiDxX6jQdPBbF8IIoTcffBs&callback=initMap&libraries=places,geometry&solution_channel=GMP_QB_commutes_v1_c" async defer></script>

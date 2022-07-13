@@ -1,0 +1,81 @@
+<%= month_calendar(events: current_user.participating_turnos, previous_link: events_ajax_previous_link, next_link: events_ajax_next_link) do |date, turnos| %>
+  <%= date.strftime('%-d') %>
+  <div class='columns is-multiline' style="width: 100%; height: 100%;">
+    <% turnos.each do |turno| %>
+      <div class='column'>
+        <% if turno.driver == current_user %>
+          <span class="button is-light is-warning has-tooltip-multiline modal-button" data-target=<%= "modal-card#{turno.id}" %> ><%= turno.datetime.strftime('%k:%M') %></span>
+        <% else %>
+          <span class="button is-light is-info has-tooltip-multiline modal-button" data-target=<%= "modal-card#{turno.id}" %>> <%= turno.datetime.strftime('%k:%M') %></span>
+        <% end %>
+      </div>
+
+      <!--  ===============
+      HERE BE MODALS
+      ===============  -->
+      <!-- 3dFlipVertical card tiny -->
+      <div id=<%= "modal-card#{turno.id}" %>  class="modal modal-fx-3dSlit" align="center">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <!-- content -->
+          <div class="card">
+          <!-- card-image
+            <div class="card-image">
+              <figure class="image is-4by3">
+                <img src="https://source.unsplash.com/6Ticnhs1AG0" alt="Placeholder image">
+              </figure>
+            </div> -->
+            <div class="card-content">
+              <div class="media">
+              <!-- left-image
+              <div class="media-left">
+                <figure class="image is-48x48">
+                  <%= image_tag(current_user.display_avatar, class: "expel") %>
+                  <sub><%="#{turno.driver.username}" %> </sub>
+                </figure>
+              </div> -->
+                <div class="media-content">
+                  <p class="title">De <b><%=turno.departure_address%></b> a <b><%=turno.arrival_address%></b></p>
+                  <p class="subtitle"><%= turno.datetime.strftime("%l:%M %P - %e de %b del %Y") %></p>
+                  <% if turno.status == "Scheduled" %>
+                      <div class="tag is-success is-light is-rounded">Agendado<% if turno.status =="Travelling" %> &ensp;<div class="loader"></div><% end %> </div>
+                  <% elsif turno.status == "Finished" %>
+                      <div class="tag is-danger is-light is-rounded">Finalizado<% if turno.status =="Travelling" %> &ensp;<div class="loader"></div><% end %> </div>
+                  <% elsif turno.status == "Travelling" %>
+                      <div class="tag is-info is-rounded">Viajando<% if turno.status =="Travelling" %> &ensp;<div class="loader"></div><% end %> </div>
+                  <% end %>
+                </div>
+              </div>
+              <div class="content">
+                <div class="columns">
+                  <div class="column">
+                    <b><%= "Conductor: "%></b><br> <%="#{turno.driver.username}" %> 
+                    <figure class="image" style="margin: auto;">
+                        <%= image_tag(turno.driver.display_avatar, class: "is-rounded", style: "max-height: 60px; width: auto;" ) %>
+                    </figure>
+                  </div>
+                  <div class="column" align="center">
+                    <b>Pasajeros:</b> <%= "(#{turno.passengers.count}/#{turno.seats})" %> <br>
+                    <div class="column is-offset-one-quarter" align="left">
+                      <% turno.passengers.each do |pasajero| %>
+                        <%= " • #{pasajero.username}" %> <br>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <%= button_to "Ver Turno", turnos_show_path(turno.id), method: :get, :class => "button is-light is-info"%>
+            <br>
+          </div>
+          <!-- end content -->
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+      </div>
+      <!-- end tiny modal card -->
+    <% end %>
+  </div>
+<% end %>
+
+
+<script src="https://unpkg.com/bulma-modal-fx/dist/js/modal-fx.min.js"></script>

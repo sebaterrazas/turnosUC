@@ -1,0 +1,39 @@
+<br>
+<div class="title is-2 has-text-info"><i class="fa-solid fa-magnifying-glass is-small has-text-warning" style="font-size: 30px;"></i>
+<% if params[:q]!="" %>
+    <% if @filtered_users %>
+        Nombres con '<%= params[:q]%>' </div>
+    <% else %>
+        No se han encontrado usuarios con '<%= params[:q]%>' </div>
+    <% end %>
+<% else %>
+        Todos los usuarios</div>
+<% end %>
+
+<br>
+<section class="container" style="width: 80%; overflow:auto; max-height: 520px;">
+    <% n = 0 %>
+    <% @filtered_users.each do |user| %>
+        <% n += 1 %>
+        <% if n % 3 == 1 %> <div class="columns features"> <% end %>
+            <div class="column is-4">
+            <a href=<%= "#{users_show_path(user.id)}"%>>
+            <div class="card is-shady">
+                <div class="card-image outer">
+                <figure class="image is-4by3"  style="margin: auto;">
+                    <%= image_tag(user.display_avatar, :class=>"is-rounded", style: "max-width: 80%; max-height: 95%; width: auto; margin: auto;") %>
+                </figure>
+                </div>
+                <div class="card-content">
+                <div class="content">
+                    <h4><%=user.username%></h4>
+                    <p></p>
+                    <%= button_to "Ver Perfil", users_show_path(user.id), method: :get, :class=>"button is-small is-warning" %>
+                </div>
+                </div>
+            </div>
+            </a>
+            </div>
+        <% if n % 3 == 0 %> </div> <% end %>
+    <% end %>
+</section>

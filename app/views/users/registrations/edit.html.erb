@@ -1,0 +1,332 @@
+<style>
+
+  .sb-title {
+    position: relative;
+    top: -12px;
+    font-family: Roboto, sans-serif;
+    font-weight: 500;
+  }
+
+  .sb-title-icon {
+    position: relative;
+    top: -5px;
+  }
+
+  .card-container {
+    display: flex;
+    height: 500px;
+    width: 600px;
+  }
+
+  .panel {
+    background: white;
+    width: 300px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+
+  .half-input-container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .half-input {
+    max-width: 120px;
+  }
+
+  .map {
+    width: 300px;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: Roboto, sans-serif;
+  }
+
+  input {
+    height: 30px;
+  }
+
+  input {
+    border: 0;
+    border-bottom: 1px solid black;
+    font-size: 14px;
+    font-family: Roboto, sans-serif;
+    font-style: normal;
+    font-weight: normal;
+  }
+
+  input:focus::placeholder {
+    color: white;
+  }
+
+  .button-cta {
+    height: 40px;
+    width: 40%;
+    background: #3367d6;
+    color: white;
+    font-size: 15px;
+    text-transform: uppercase;
+    font-family: Roboto, sans-serif;
+    border: 0;
+    border-radius: 3px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.48);
+    cursor: pointer;
+  }
+</style>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<br>
+<div class="titulo title is-3">Editar perfil</div>
+<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+  <div class="columns">
+    <div class="column is-one-quarter is-offset-1">
+      <div class="column box">
+        <%= render "users/shared/error_messages", resource: resource %>
+        <figure class="image">
+          <%= image_tag(@user.display_avatar, :class=>"is-rounded", style:"max-height: 115px; width: auto; margin: auto;") %>
+        </figure>
+        <br>
+        <div align="center">
+          <%= f.file_field :profile_pic, autocomplete: "profile_pic", :hidden => true%>
+        </div>
+
+        <div class="file is-centered">
+          <label class="file-label">
+            <input class="file-input" type="file" name="user[profile_pic]" id="user_profile_pic" autocomplete="profile_pic">
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">
+                Cambiar Foto de Perfil
+              </span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="column box">
+        <div class="tabs is-boxed is-centered" id="nav">
+          <ul>
+            <li data-target="pane-1" id="1">
+                <a>
+                  <span class="icon is-small"><i class="fa-solid fa-arrows-rotate"></i></span>
+                  <span>Cambiar contraseña </span>
+                </a>
+            </li>
+          </ul>
+        </div>
+        <div class="tab-pane" id="pane-1" align="left">
+          <div class="field">
+            <h3 class="label"> Nueva Contraseña</h3>
+            <%= f.password_field :password, autocomplete: "new-password", :class=>"input", :placeholder=>"Nueva Contraseña"%>
+            <% if @minimum_password_length %>
+              <em><%= @minimum_password_length %> caracteres mínimo</em>
+            <% end %>
+          </div>
+          <div class="field">
+            <h3 class="label"> Confirmar Nueva Contraseña</h3>
+            <%= f.password_field :password_confirmation, autocomplete: "new-password", :class=>"input", :placeholder=>"Nueva Contraeseña" %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="column is-one-quarter">
+      <div class="column box" align="left">
+        <div class="ml-3">
+          <div class="field">
+            <h3 class="label"> Nombre </h3>
+            <%= f.text_field :username, autofocus: true, autocomplete: "username", :class=>"input", :type=>"text", :placeholder=>"Nombre"%>
+          </div>
+
+          <div class="field">
+            <h3 class="label">Dirección </h3>
+            <%= f.text_field :address, autofocus: true, autocomplete: "address", :class=>"input address", :type=>"text", :placeholder=>"Dirección", id: "location-input" %>
+          </div>
+
+          <div class="field">
+            <h3 class="label">Teléfono </h3>
+            <%= f.telephone_field :phone, autocomplete: "phone", :class=>"input", :type=>"text", :placeholder=>"Teléfono", id: "telephone-input" %>
+          </div>
+          
+          <div class="field">
+            <h3 class="label"><%= f.label :email %> </h3>
+            <%= f.email_field :email, autocomplete: "email", :class=>"input", :type=>"text", :placeholder=>"Email" %>
+          </div>
+
+          <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+            <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
+          <% end %>
+        </div>
+      </div>
+
+
+      <div class="column box" align="left">
+        <div class="field">
+          <h3 class="label">Contraseña Actual</h3> <i>(Necesario para confirmar cambios)</i><br />
+          <%= f.password_field :current_password, autocomplete: "current-password", :class=>"input mb-4", :placeholder=>"Contraseña"%>
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-half">
+      <div class="card-container">
+        <div class="map" id="gmp-map"></div>
+      </div>
+    </div>
+  </div>
+  <div align="center" class="actions">
+    <%= f.submit "Confirmar cambios", :class=> "button is-info mb-2 mt-0" %>
+  </div>
+<% end %>
+
+<div align="center">
+  <%= button_to "Borrar cuenta", registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete, :class=> "button is-danger is-light is-small mb-2" %>
+</div>
+
+<script>
+    document.querySelectorAll("#nav li").forEach(function(navEl) {
+        navEl.onclick = function() { toggleTab(this.id, this.dataset.target); }
+    });
+
+    function toggleTab(selectedNav, targetId) {
+        var navEls = document.querySelectorAll("#nav li");
+
+        navEls.forEach(function(navEl) {
+        if (navEl.id == selectedNav) {
+        if (navEl.classList.contains("is-active")) {
+            navEl.classList.remove("is-active");
+        } else {
+        navEl.classList.add("is-active");
+        }
+        } else {
+        if (navEl.classList.contains("is-active")) {
+            navEl.classList.remove("is-active");
+        }
+        }
+        });
+
+        var tabs = document.querySelectorAll(".tab-pane");
+
+        tabs.forEach(function(tab) {
+            if (tab.style.display == "block") {
+            tab.style.display = "none";
+            } else {
+            tab.style.display = "block";
+            }
+        });
+    }
+</script> 
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLLhdVtqnFwiDxX6jQdPBbF8IIoTcffBs&libraries=places&callback=initMap&solution_channel=GMP_QB_addressselection_v1_cABC" async defer></script>
+
+<script>
+"use strict";
+
+function initMap() {
+  const CONFIGURATION = {
+    "ctaTitle": "Revisar",
+    "mapOptions": {"center":{"lat":37.4221,"lng":-122.0841},"fullscreenControl":true,"mapTypeControl":false,"streetViewControl":true,"zoom":10.25,"zoomControl":true,"maxZoom":22},
+    "mapsApiKey": "AIzaSyCLLhdVtqnFwiDxX6jQdPBbF8IIoTcffBs",
+    "capabilities": {"addressAutocompleteControl":true,"mapDisplayControl":true,"ctaControl":true}
+  };
+  const componentForm = [
+    'location',
+    'locality',
+    'administrative_area_level_1',
+    'country',
+    'postal_code',
+  ];
+
+  const getFormInputElement = (component) => document.getElementById(component + '-input');
+  const map = new google.maps.Map(document.getElementById("gmp-map"), {
+    zoom: CONFIGURATION.mapOptions.zoom,
+    center: { lat: -33.45, lng: -70.63 },
+    mapTypeControl: false,
+    fullscreenControl: CONFIGURATION.mapOptions.fullscreenControl,
+    zoomControl: CONFIGURATION.mapOptions.zoomControl,
+    streetViewControl: CONFIGURATION.mapOptions.streetViewControl
+  });
+  const marker = new google.maps.Marker({map: map, draggable: false, title: "Casa"});
+  geocode();
+  const autocompleteInput = getFormInputElement('location');
+  const autocomplete = new google.maps.places.Autocomplete(autocompleteInput, {
+    fields: ["address_components", "geometry", "name"],
+    types: ["address"],
+  });
+  autocomplete.addListener('place_changed', function () {
+    marker.setVisible(false);
+    const place = autocomplete.getPlace();
+    if (!place.geometry) {
+      // User entered the name of a Place that was not suggested and
+      // pressed the Enter key, or the Place Details request failed.
+      window.alert('No se encontró la dirección: \'' + place.name + '\'');
+      return;
+    }
+    renderAddress(place);
+    fillInAddress(place);
+  });
+
+  function fillInAddress(place) {  // optional parameter
+    const addressNameFormat = {
+      'street_number': 'short_name',
+      'route': 'long_name',
+      'locality': 'long_name',
+      'administrative_area_level_1': 'short_name',
+      'country': 'long_name',
+      'postal_code': 'short_name',
+    };
+    const getAddressComp = function (type) {
+      for (const component of place.address_components) {
+        if (component.types[0] === type) {
+          return component[addressNameFormat[type]];
+        }
+      }
+      return '';
+    };
+    if (getAddressComp('street_number') !== "") {
+      getFormInputElement('location').value = getAddressComp('street_number') + ' '
+              + getAddressComp('route') + ', '
+              + getAddressComp('locality') + ', '
+              + getAddressComp('country');
+    } else {
+      getFormInputElement('location').value = getAddressComp('route') + ', '
+              + getAddressComp('locality') + ', '
+              + getAddressComp('country');
+    }
+    for (const component of componentForm) {
+      // Location field is handled separately above as it has different logic.
+      if (component !== 'location') {
+        getFormInputElement(component).value = getAddressComp(component);
+      }
+    }
+  }
+
+  function renderAddress(place) {
+    // map.setCenter(place.geometry.location);
+    marker.setPosition(place.geometry.location);
+    marker.setVisible(true);
+  }
+
+  function geocode(location){
+    var location = document.getElementById('location-input').value;
+    axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
+      params: {
+        address: location,
+        key: 'AIzaSyCLLhdVtqnFwiDxX6jQdPBbF8IIoTcffBs'
+      }
+    })
+    .then(function(response) {
+      marker.setPosition(response.data.results[0].geometry.location);
+      marker.setVisible(true);
+    })
+    .catch(function(error){
+      console.log(error);
+    });
+  }
+}
+</script>

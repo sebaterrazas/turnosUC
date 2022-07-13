@@ -1,0 +1,35 @@
+<table class="column is-full has-background-grey-lighter has-scrollbar" align="center">
+    <tbody class="chat" 
+        <% for msg in @turno.messages %>
+            <tr class="content">
+            <% if current_user == msg.user %> 
+                <td ></td><td></td> <td align='right'> <div class="message is-info is-small user has-text-right">
+            <% else %>
+                <td class="profile-pic">
+                    <figure class="image is-64x64">
+                    <%= image_tag(msg.user.display_avatar, size: "50", class: "is-rounded") %>
+                    </figure>
+                </td>
+                <td align='left'> <div class="message is-info is-small not-user has-text-left">
+            <% end %>
+                <div class="message-header" <% if current_user == msg.user %> align='right' <% end %>>
+                    <p > <%= msg.user.username %> <% if @turno.driver == msg.user %> <i class="fa-solid fa-id-card"></i><%end%></b> </p>
+                </div>
+                <div class="message-body">
+                    <%= msg.text %> <br> <sub><%=msg.created_at.strftime('%l:%M %p')%></sub>
+                </div>
+                </div>
+            </td>
+            <% if current_user == msg.user %> 
+            <td class="profile-pic">
+                <figure class="image is-64x64">
+                <%= image_tag(msg.user.display_avatar, size: "50", class: "is-rounded") %>
+                </figure>
+            </td>
+            <%else%>
+            <td></td>
+            <% end %>
+            </tr>
+        <% end %>
+    <tbody>
+</table>

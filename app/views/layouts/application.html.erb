@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top" style="scroll-behavior: smooth">
+  <head>
+    <meta charset="utf-8">
+    <title>Grupo 26</title>
+    <%= favicon_link_tag %>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <script src="https://kit.fontawesome.com/f0ab833f4c.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+  </head>
+
+  <body align="center" class="has-background-info-light">
+    <%= render "layouts/navbar" %>
+    <br>
+    <p class="notice"><%= notice %></p>
+    <p class="alert"><%= alert %></p>
+    <%= yield %>
+  </body>
+<br>
+<br>
+<footer class="footer has-background-grey-light">
+  <!-- Three columns created using columns class of Bulma -->
+  <div class="columns">
+      <!-- Column 1 -->
+    <div class="column">
+  
+      <!-- Heading is left aligned, medium weight -->
+      <h4 class="bd-footer-title 
+                 has-text-weight-medium
+                 has-text-left">
+       Sobre nosotros
+      </h4>
+      <br>
+  
+      <!-- footer content -->
+      <p class="bd-footer-link 
+                has-text-left">
+        <%= image_tag("logo_cami.png", size: "70") %> es un portal web para coordinar los viajes de ida y vuelta de los alumnos de la Pontificia Universidad Católica de Chile.
+      </p>
+  
+    </div>
+  
+    <!-- Column 2 -->
+    <div class="column">
+      <h4 class="bd-footer-title 
+                 has-text-weight-medium 
+                 has-text-justify">
+        Conoce a la UC
+      </h4>
+  
+      <!-- Column 2 lists with links -->
+      <p class="bd-footer-link">
+        <a href="https://www.uc.cl">
+          <%= image_tag("uc_colors.png", style:"max-height: 84px; width:auto") %>
+        </a>
+          <br />
+          <br />
+          <a href="https://www.uc.cl/universidad/nuestros-campus/">
+              <span class="icon-text">
+                <span>Campus</span>
+              </span>
+          </a>
+      </p>
+  
+    </div>
+  
+    <!-- Column 3 -->
+    <div class="column">
+      <h4 class="bd-footer-title
+                 has-text-weight-medium
+                 has-text-justify">
+        Contáctanos
+      </h4>
+    <br>
+      <!-- Column 3 lists with links -->
+      <p class="bd-footer-link">
+        <a href="mailto: sebaterrazas@uc.cl?Subject=Turnos%20UC">
+          <span class="icon-text">
+            <span><i class="fa-solid fa-envelope"></i> Email</span>
+          </span>
+        </a>
+      </p>
+  
+    </div>
+  </div>
+</footer>
+</html>

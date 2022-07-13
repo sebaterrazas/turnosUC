@@ -1,0 +1,241 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ *= require simple_calendar
+ *= require font-awesome
+ */
+
+@import "https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css";
+
+.message {
+    position:relative;
+    border-radius: 15px;
+    display: inline-block;
+}
+    .user:before {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    color: hsl(204, 86%, 53%);
+    border-left: 10px solid;
+    border-right: 10px solid transparent;
+    border-top: 10px solid;
+    border-bottom: 10px solid transparent;
+    right: -15px;
+    top: 0px;
+}
+
+.not-user:before {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    color: hsl(204, 86%, 53%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid;
+    border-top: 10px solid;
+    border-bottom: 10px solid transparent;
+    left: -15px;
+    top: 0px;
+}
+
+td {
+    padding:5px
+}
+
+.simple-calendar {
+    width: 100%;
+    height: 100%;
+}
+
+.expel {
+    border-radius: 100%;
+    font-size: 10px;
+}
+
+.navbar-link.is-arrowless {
+    border: 0px solid transparent;
+}
+
+tbody.chat{
+    width: 100%;
+    display: table;
+}
+td.profile-pic {
+    width: 64px
+}
+
+body { padding-top: 30px; }
+
+.invert{
+    filter: invert(1);
+}
+
+.tabs {
+    margin-bottom: -1px !important;
+    position: relative;
+    }
+    .tab-content {
+    padding: 60px;
+    top: 197px;
+    color: #000;
+    background-color: white;
+    }
+    .tab-pane {
+    display: none;
+    }
+    .tab-pane.is-active {
+    display: block;
+    position: relative;
+    }
+    .is-active {
+    display: initial;
+    }
+
+.os-content-arrange {
+    max-height: 0px;
+}
+
+.os-content {
+    padding: 10px 0 0 !important;
+    width: 100% !important;
+}
+
+table.has-scrollbar {
+    max-height:300px;
+    overflow:auto; 
+    display: flex; 
+    flex-direction: column-reverse;
+}
+
+#table-wrapper {
+    position:relative;
+  }
+#table-scroll {
+    height:200px;
+    overflow:auto; 
+    width:755px;
+}
+#table-wrapper table {
+    width:100%;
+}
+#table-wrapper table * {
+    vertical-align:top;
+}
+#table-wrapper table thead th .text {
+    position:absolute;   
+    top:-20px;
+    z-index:2;
+    height:20px;
+    width:35%;
+}
+
+.scrolling-wrapper {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+.titulo {
+    font-size: 25px;
+    font-weight: bold;
+    line-height: 25px;
+}
+.titulo2 {
+    font-size: 20px;
+}
+
+.nav::placeholder {
+    color: lightblue !important;
+}
+
+* {
+    font-family: 'Nunito Sans', sans-serif;
+}
+
+#parallax-sj {
+    background: url(https://www.uc.cl/site/assets/files/1166/entrada-campus-san-joaquin-vista-del-cristo.jpg);
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-top: 20px solid hsl(48, 100%, 67%);
+    }
+
+
+#parallax-cc {
+    background: url(https://www.uc.cl/site/assets/files/1163/central.jpg);
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-top: 20px solid hsl(48, 100%, 67%);
+    }
+
+#parallax-co {
+    background: url(https://www.uc.cl/site/assets/files/1165/fachada-campus-oriente-al-atardecer-fotografo-cesar-cortes.png);
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-top: 20px solid hsl(48, 100%, 67%);
+    }
+
+#parallax-lc {
+    background: url(https://www.uc.cl/site/assets/files/12357/lc1.jpg);
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-top: 20px solid hsl(48, 100%, 67%);
+    }
+
+#parallax-meones {
+    background: url(https://www.uc.cl/site/assets/files/1446/escuela_de_ingenieria2.jpg);
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-top: 20px solid hsl(48, 100%, 67%);
+    }
+
+.title.inicio {
+    color: white;
+    font-weight: 800;
+    font-size: 4rem;
+    text-shadow: 1px 1px 1px #000, 3px 3px 5px rgb(0, 0, 3);
+    }
+
+.subtitle.inicio {
+color: white;
+font-size: 1.2rem;
+text-shadow: 1px 1px 1px #000, 3px 3px 5px rgb(0, 0, 3);
+}
+
+hr.content-divider {
+max-width: 75px;
+height: 5px;
+}
+
+#parallax {
+background-attachment: fixed;
+background-position: center;
+background-repeat: no-repeat;
+background-size: cover;
+border-top: 20px solid hsl(48, 100%, 67%);
+}
+
+hr {
+background: hsl(48, 100%, 67%);
+}

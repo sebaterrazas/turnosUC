@@ -1,0 +1,30 @@
+<h1 align="center" class="title is-2">Escribir reseña</h1>
+
+<div align="center">
+    <div class="column box is-one-quarter" align="left">
+        <div align="center" class='profile_pic'>
+            <figure class="image is-128x128">
+                <%= image_tag(@turno.driver.display_avatar, :class=>"is-rounded") %>
+            </figure>
+        </div>
+        <%= form_for @review do |form| %>
+            <div class="ml-3">
+                <%= form.label :Calificacion, :class => "label"%>
+                <%= form.number_field :qualification, in: 1..5, step: 1 %>
+            </div>
+
+            <div class="ml-3">
+                <%= form.label :Contenido, :class => "label"%> <i>(Opcional)</i>
+                <%= form.text_field :content, :class=>"input", :type=>"text", :placeholder=>"Reseña"%>
+            </div>
+
+            <div class="ml-3">
+                <%= form.hidden_field :user_id, value: current_user.id %>
+                <%= form.hidden_field :turno_id, value: @turno.id %>
+
+            <div align="center">
+                <%= form.submit 'Enviar reseña', :class=> "button is-info is-light mt-5" %>
+            </div>
+        <% end %>
+    </div>
+</div>
