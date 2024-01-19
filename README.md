@@ -1,7 +1,7 @@
 
 # TurnosUC
 
-IMPORTANT: Due to Heroku free tier policy change, this link doesn't work anymore. Either way, you can watch a demo in my [personal webpage](https://sebaterrazas.github.io/).
+IMPORTANT: Due to Heroku free tier policy change, this link doesn't work anymore. Either way, you can watch a demo video in my [personal webpage](https://sebaterrazas.github.io/#turnos-uc).
 
 [Heroku link](https://grupo-26.herokuapp.com/).
 
